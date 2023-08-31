@@ -25,59 +25,60 @@ test.describe("Appcenter home page", () => {
     const noElementSelector = ".bad-selector";
     const selector = validSelector;
 
-    const elements = await page.locator(selector).all();
-    if (elements.length > 1)
-      throw new Error(`Multiple elements found matching selector: ${selector}`);
+    // const elements = await page.locator(selector).all();
+    // if (elements.length > 1)
+    //   throw new Error(`Multiple elements found matching selector: ${selector}`);
 
-    const isVisible = await page.locator(selector).isVisible();
-    if (!isVisible)
-      throw new Error(`No elements found matching selector: ${selector}`);
+    // const isVisible = await page.locator(selector).isVisible();
+    // if (!isVisible)
+    //   throw new Error(`No elements found matching selector: ${selector}`);
 
     // actual algorithm starts here
 
-    // get element with given selector (working)
-    const element = await page.evaluate(
-      ({ selector }) =>
-        document.querySelector(
-          '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]'
-        ),
-      { selector }
-    );
+    // await page.evaluate(() => {
+    //   const q1 = document.querySelector(
+    //     '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]'
+    //   );
+    //   const q2 = document.querySelector(
+    //     '[data-testid="bws-marketplace-homepage-category-card-rewardAndRecognition"]'
+    //   );
+    //   console.log(`[DEBUG] ${q1 === q2}`); // this works???
+    // });
 
-    const element2 = await page.evaluate(() =>
-      document.querySelector(
-        '[data-testid="bws-marketplace-homepage-category-card-rewardAndRecognition"]'
-      )
-    );
+    // keep array of elements we have visited
+    const visited: Element[] = [];
+    let focused;
 
-    console.log(`[DEBUG] ${element === element2}`); // this evaluates to true???
-    await page.evaluate(() => {
-      const q1 = document.querySelector(
-        '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]'
+    await page.keyboard.press("Tab");
+
+    while (!visited.includes(focused)) {
+      await page.evaluate(
+        ({ selector, focused, visited }) => {
+          const element = document.querySelector(selector);
+          focused = document.activeElement;
+          if (element === focused) return;
+
+          visited.push(focused);
+        },
+        {
+          selector,
+          focused,
+          visited,
+        }
       );
-      const q2 = document.querySelector(
-        '[data-testid="bws-marketplace-homepage-category-card-rewardAndRecognition"]'
-      );
-      console.log(`[DEBUG] ${q1 === q2}`); // this works??? 
-    });
-
-    // keep array of elements we have seen
-    const seen: Element[] = [];
+      await page.keyboard.press("Tab");
+    }
 
     // tab until the element we are looking for is active or the active element is first element we saw
-    await page.keyboard.press("Tab");
-    let curActive: Element = await page.evaluate(() => {
-      return document.activeElement;
-    });
 
-    while (curActive !== seen[0]) {
-      console.log(seen);
-      console.log(curActive === element); // evaluates to true?
-      if (curActive === element) return;
-      seen.push(curActive);
-      await page.keyboard.press("Tab");
-      curActive = await page.evaluate(() => document.activeElement);
-    }
+    // while (curActive !== seen[0]) {
+    //   console.log(seen);
+    //   console.log(curActive === element); // evaluates to true?
+    //   if (curActive === element) return;
+    //   seen.push(curActive);
+    //   await page.keyboard.press("Tab");
+    //   curActive = await page.evaluate(() => document.activeElement);
+    // }
     await page.keyboard.press("Enter");
   });
 
