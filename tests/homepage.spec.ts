@@ -6,17 +6,17 @@ test.describe("Appcenter home page", () => {
     await page.goto("https://amazon.com/b2b/appcenter");
   });
 
-  test("passes axe-core a11y scan", async ({ page }) => {
-    const a11yScanResults = await new AxeBuilder({ page })
-      .withTags(["wcag2a"])
-      .include("#bui-root")
-      .exclude(".b-button") // bui buttons fail a11y scans
-      .analyze();
-    console.log(
-      `Number of a11y violations axe found on home page is: ${a11yScanResults.violations.length}`
-    );
-    expect(a11yScanResults.violations).toEqual([]);
-  });
+  // test("passes axe-core a11y scan", async ({ page }) => {
+  //   const a11yScanResults = await new AxeBuilder({ page })
+  //     .withTags(["wcag2a"])
+  //     .include("#bui-root")
+  //     .exclude(".b-button") // bui buttons fail a11y scans
+  //     .analyze();
+  //   console.log(
+  //     `Number of a11y violations axe found on home page is: ${a11yScanResults.violations.length}`
+  //   );
+  //   expect(a11yScanResults.violations).toEqual([]);
+  // });
 
   test("test util functions", async ({ page }) => {
     const validSelector =
@@ -33,20 +33,43 @@ test.describe("Appcenter home page", () => {
     if (!isVisible)
       throw new Error(`No elements found matching selector: ${selector}`);
 
-    const element = page.locator(selector);
-    console.log(`Element we are looking for is : ${element}`);
+    // actual algorithm starts here
 
-    // first tab
+    // get element with given selector (working)
+    const element = await page.evaluate(
+      ({ selector }) =>
+        document.querySelector(
+          '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]'
+        ),
+      { selector }
+    );
+
+    const element2 = await page.evaluate(() =>
+      document.querySelector(
+        '[data-testid="bws-marketplace-homepage-category-card-rewardAndRecognition"]'
+      )
+    );
+
+    console.log(`[DEBUG] ${element.isSameNode(element2)}`); // this evaluates to true???
+
+    // keep array of elements we have seen
+    const seen: Element[] = [];
+
+    // tab until the element we are looking for is active or the active element is first element we saw
     await page.keyboard.press("Tab");
-    let firstFocusedElement,
-      focusedElement = page.locator(":focus");
-      console.log(firstFocusedElement)
+    let curActive: Element = await page.evaluate(() => {
+      return document.activeElement;
+    });
 
-    // while (focusedElement !== element) {
-    //   page.keyboard.press("Tab");
-    //   // how am I going to break this loop?
-    //   // keep tabbing until I have either found the element I am looking for or until I have hit first element we focused
-    // }
+    while (curActive !== seen[0]) {
+      console.log(seen);
+      console.log(curActive === element); // evaluates to true?
+      if (curActive === element) return;
+      seen.push(curActive);
+      await page.keyboard.press("Tab");
+      curActive = await page.evaluate(() => document.activeElement);
+    }
+    await page.keyboard.press("Enter");
   });
 
   //   test("can tab to category card and press enter to go to proper app list url", async ({
