@@ -50,7 +50,16 @@ test.describe("Appcenter home page", () => {
       )
     );
 
-    console.log(`[DEBUG] ${element.isSameNode(element2)}`); // this evaluates to true???
+    console.log(`[DEBUG] ${element === element2}`); // this evaluates to true???
+    await page.evaluate(() => {
+      const q1 = document.querySelector(
+        '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]'
+      );
+      const q2 = document.querySelector(
+        '[data-testid="bws-marketplace-homepage-category-card-rewardAndRecognition"]'
+      );
+      console.log(`[DEBUG] ${q1 === q2}`); // this works??? 
+    });
 
     // keep array of elements we have seen
     const seen: Element[] = [];
