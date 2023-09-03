@@ -1,10 +1,32 @@
 import { test, expect, Locator } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { tabToElement } from "./utils";
 
-test.describe("Appcenter home page", () => {
+test.describe("home page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("https://amazon.com/b2b/appcenter");
+    const playgroundUrl = "https://melodic-hamster-45acd5.netlify.app";
+    const appCenterUrl = "https://amazon.com/b2b/appcenter";
+    await page.goto(appCenterUrl);
   });
+
+  test("test tabToElement function", async ({ page }) => {
+    await tabToElement(page, '.lsadkj');
+    await page.keyboard.press("Enter");
+    expect(page.url()).toBe(
+      "https://melodic-hamster-45acd5.netlify.app/typography"
+    );
+  });
+
+  // test("tabbing to first link and enter takes to typography page", async ({
+  //   page,
+  // }) => {
+  //   // only works in chrome??? - update: tried myself and I actually can't tab to this element in firefox or safari, so playwright seems to be accurate here
+  //   await page.keyboard.press("Tab");
+  //   await page.keyboard.press("Enter");
+  //   expect(page.url()).toBe(
+  //     "https://melodic-hamster-45acd5.netlify.app/typography"
+  //   );
+  // });
 
   // test("passes axe-core a11y scan", async ({ page }) => {
   //   const a11yScanResults = await new AxeBuilder({ page })
@@ -18,69 +40,69 @@ test.describe("Appcenter home page", () => {
   //   expect(a11yScanResults.violations).toEqual([]);
   // });
 
-  test("test util functions", async ({ page }) => {
-    const validSelector =
-      '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]';
-    const mulipleElementsSelector = ".b-button";
-    const noElementSelector = ".bad-selector";
-    const selector = validSelector;
+  // test("test util functions", async ({ page }) => {
+  //   const validSelector =
+  //     '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]';
+  //   const mulipleElementsSelector = ".b-button";
+  //   const noElementSelector = ".bad-selector";
+  //   const selector = validSelector;
 
-    // const elements = await page.locator(selector).all();
-    // if (elements.length > 1)
-    //   throw new Error(`Multiple elements found matching selector: ${selector}`);
+  //   // const elements = await page.locator(selector).all();
+  //   // if (elements.length > 1)
+  //   //   throw new Error(`Multiple elements found matching selector: ${selector}`);
 
-    // const isVisible = await page.locator(selector).isVisible();
-    // if (!isVisible)
-    //   throw new Error(`No elements found matching selector: ${selector}`);
+  //   // const isVisible = await page.locator(selector).isVisible();
+  //   // if (!isVisible)
+  //   //   throw new Error(`No elements found matching selector: ${selector}`);
 
-    // actual algorithm starts here
+  //   // actual algorithm starts here
 
-    // await page.evaluate(() => {
-    //   const q1 = document.querySelector(
-    //     '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]'
-    //   );
-    //   const q2 = document.querySelector(
-    //     '[data-testid="bws-marketplace-homepage-category-card-rewardAndRecognition"]'
-    //   );
-    //   console.log(`[DEBUG] ${q1 === q2}`); // this works???
-    // });
+  //   // await page.evaluate(() => {
+  //   //   const q1 = document.querySelector(
+  //   //     '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]'
+  //   //   );
+  //   //   const q2 = document.querySelector(
+  //   //     '[data-testid="bws-marketplace-homepage-category-card-rewardAndRecognition"]'
+  //   //   );
+  //   //   console.log(`[DEBUG] ${q1 === q2}`); // can do comparisons with querySelector only when inside page.evaluate()
+  //   // });
 
-    // keep array of elements we have visited
-    const visited: Element[] = [];
-    let focused;
+  //   // keep array of elements we have visited
+  //   const visited: Element[] = [];
+  //   let focused;
 
-    await page.keyboard.press("Tab");
+  //   await page.keyboard.press("Tab");
 
-    while (!visited.includes(focused)) {
-      await page.evaluate(
-        ({ selector, focused, visited }) => {
-          const element = document.querySelector(selector);
-          focused = document.activeElement;
-          if (element === focused) return;
+  //   while (!visited.includes(focused)) {
+  //     await page.evaluate(
+  //       ({ selector, focused, visited }) => {
+  //         const element = document.querySelector(selector);
+  //         focused = document.activeElement;
+  //         if (element === focused) return;
 
-          visited.push(focused);
-        },
-        {
-          selector,
-          focused,
-          visited,
-        }
-      );
-      await page.keyboard.press("Tab");
-    }
+  //         visited.push(focused);
+  //       },
+  //       {
+  //         selector,
+  //         focused,
+  //         visited,
+  //       }
+  //     );
+  //     await page.keyboard.press("Tab");
+  //   }
 
-    // tab until the element we are looking for is active or the active element is first element we saw
+  //   // tab until the element we are looking for is active or the active element is first element we saw
 
-    // while (curActive !== seen[0]) {
-    //   console.log(seen);
-    //   console.log(curActive === element); // evaluates to true?
-    //   if (curActive === element) return;
-    //   seen.push(curActive);
-    //   await page.keyboard.press("Tab");
-    //   curActive = await page.evaluate(() => document.activeElement);
-    // }
-    await page.keyboard.press("Enter");
-  });
+  //   // while (curActive !== seen[0]) {
+  //   //   console.log(seen);
+  //   //   console.log(curActive === element); // evaluates to true?
+  //   //   if (curActive === element) return;
+  //   //   seen.push(curActive);
+  //   //   await page.keyboard.press("Tab");
+  //   //   curActive = await page.evaluate(() => document.activeElement);
+  //   // }
+  //   await page.keyboard.press("Enter");
+  // });
 
   //   test("can tab to category card and press enter to go to proper app list url", async ({
   //     page,
