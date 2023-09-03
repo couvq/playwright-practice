@@ -10,10 +10,10 @@ test.describe("home page", () => {
   });
 
   test("test tabToElement function", async ({ page }) => {
-    await tabToElement(page, '.lsadkj');
+    await tabToElement(page, '[data-testid="bws-marketplace-homepage-category-card-accountManagement"]');
     await page.keyboard.press("Enter");
     expect(page.url()).toBe(
-      "https://melodic-hamster-45acd5.netlify.app/typography"
+      "https://www.amazon.com/b2b/appcenter/apps?categories=accountManagement"
     );
   });
 
@@ -23,9 +23,8 @@ test.describe("home page", () => {
   //   // only works in chrome??? - update: tried myself and I actually can't tab to this element in firefox or safari, so playwright seems to be accurate here
   //   await page.keyboard.press("Tab");
   //   await page.keyboard.press("Enter");
-  //   expect(page.url()).toBe(
-  //     "https://melodic-hamster-45acd5.netlify.app/typography"
-  //   );
+  //   await page.keyboard.press('Tab')
+  //   expect(page.locator('[data-testid="bws-marketplace-common-assets-navigation-appcenter-link"]')).toBeFocused();
   // });
 
   // test("passes axe-core a11y scan", async ({ page }) => {

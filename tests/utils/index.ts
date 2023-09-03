@@ -16,39 +16,40 @@ const tabTo = async (
   selector: string,
   visited: Element[] = []
 ): Promise<void> => {
-  page.evaluate(
+  const validSelector = await page.evaluate(
     ({ selector }) => {
       if (!document.querySelector(selector)) {
         console.error(`No elements found with selector: ${selector}`);
-        return;
-      }
-
-      if (document.querySelectorAll(selector).length > 0) {
+        return false;
+      } else if (document.querySelectorAll(selector).length > 1) {
         console.error(`Multiple elements found with selector: ${selector}`);
-        return;
+        return false;
+      } else {
+        return true;
       }
     },
     { selector }
   );
   await page.keyboard.press("Tab");
 
-  await page.evaluate(
+  const foundTarget = await page.evaluate(
     ({ selector, visited }) => {
       const target = document.querySelector(selector);
       const focused = document.activeElement;
 
       if (focused === target) {
         console.log(`Element with selector ${selector} is focused`);
-        return;
+        return true;
       }
 
-      if (!document.activeElement) return;
+      if (!document.activeElement) return false;
 
       // @ts-ignore
       if (visited.includes(focused)) {
         console.error(
           `Element with selector ${selector} is not a tabbable element`
         );
+        return false;
       }
 
       // @ts-ignore
@@ -57,5 +58,5 @@ const tabTo = async (
     { selector, visited }
   );
 
-  return tabTo(page, selector, visited);
+  if (validSelector && !foundTarget) return tabTo(page, selector, visited);
 };
